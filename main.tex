@@ -1,0 +1,419 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{graphicx}
+\usepackage[pdf]{graphviz}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{placeins}
+\usepackage{acronym}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{soul}
+\usepackage{mdframed}
+\usepackage{framed}
+\usepackage{multicol}
+\usepackage{balance}
+\usepackage{hyperref}
+
+\graphicspath{ {./images/} }
+
+\newenvironment{finding}{\begin{framed}\noindent\textbf{Take-away.}~}{\end{framed}}
+
+\acrodef{SoK}{Systematization of Knowledge}
+\acrodef{HCI}{Human Computer Interaction}
+\acrodef{DCS}{Developer-Centered Security}
+
+\newcommand{\tblheader}[1]{#1}
+\newenvironment{boxed}[0]{\begin{mdframed}}{\end{mdframed}}
+\newcommand{\etal}[0]{et~al{.}}
+\newcommand{\gvnewline}{\noexpand\n}
+\begin{document}
+\title{Developers are Neither Enemies Nor Users: They~are~Collaborators} 
+%Secure Software Development: A~Case~of~Adverse~Assumptions
+% OR I~Assume~Therefore~I~Am~Not
+%Developers' challenges, behaviors and how we intervene}
+\author{
+  \IEEEauthorblockN{Anonymous Author(s)\IEEEauthorrefmark{1}}
+  \IEEEauthorblockA{Anonymous Institution(s)}
+}
+
+\maketitle
+
+\begin{abstract}
+ Developers struggle to program securely. Prior works have reviewed the methods used to run user-studies with developers, systematized the ancestry of security API usability recommendations, and proposed research agendas to help understand developers' knowledge, attitudes towards security and priorities. In contrast we study the research to date and abstract out categories of challenges, behaviors and interventions from the results of developer-centered studies. We analyze the abstractions and identify five misplaced beliefs or \emph{tropes} about developers embedded in the core design of APIs and tools. These tropes hamper the effectiveness of  interventions to help developers program securely. Increased collaboration between developers, security experts and API designers to help developers understand the security assumptions of APIs alongside creating new useful abstractions -- derived from such collaborations -- will lead to systems with better security.
+\end{abstract}
+
+\section{Introduction}
+
+Developers' security expertise depends on varying factors such as the quality of security training they have had and their security beliefs~\cite{oltrogge2018rise}. Securing applications may, at times, be considered an afterthought: a task separate from developing the application itself. When security is considered, developers use off-the-shelf components designed with a range of security policies and assumptions that may not be effective~\cite{tahaei2019,aside2012,acar2016}. Applications are secured using cryptographic APIs, but developers find them hard to use~\cite{smithgreen2016, tahaei2019, acar2016}. These technical challenges may push developers into unknowingly adopting potentially dangerous behaviors to deal with the difficulty of secure programming. 
+
+
+
+Three notable studies in developer-centered security include the works of Patnaik~\etal{}~\cite{patnaik2021classics}, Tahaei~\etal{}~\cite{tahaei2019} and Acar~\etal{}~\cite{acar2016}.
+Patnaik~\etal{} trace 45 years of recommendations from 65 papers to support API developers to improve the usability of their libraries. They find a strong focus on helping developers with constructing and structuring their code with the intention of making the code more usable and easier to understand; but less focus on documentation, writing requirements and code quality assessment. They also find weak levels of empirical validation among papers~\cite{patnaik2021classics}.
+%
+Tahaei~\etal{} review 49 \ac{DCS} papers to understand different methodologies used to run the studies. They find that it is difficult to study developers in a lab environment because of factors that are difficult to replicate such as the long periods of time developers spend working on a code including refactoring, code-reviews, and decision making processes that involve multiple stakeholders. It is also hard to study developers under limited time constraints---as experiments can range from 15 minutes to 3 days but this isn't always enough. Tahaei~\etal{} compare the methodologies used to that of research in Human-Computer Interaction \ac{HCI}, and note that they are implemented poorly~\cite{tahaei2019}.
+%
+Acar~\etal{} argues for a better understanding of the motivations and priorities of developers rather than blaming them for not being mindful of security. They stress the need for developer-centered studies to understand the challenges that developers face when using security APIs, and the resources available to improve the usability of these APIs. They propose taking the developer out of the loop whenever possible while recommending usable APIs in other instances along with secure and usable information sources and tools~\cite{acar2016}. 
+%
+Our study complements these prior works. We analyze 72 papers written over 13 years in order to identify overarching challenges faced by developers and their consequent behavior. We study how interventions intersect with the developer behavior in response to the challenges. We create a categorization for the challenges, behaviors and interventions; and answer the following questions:
+
+\begin{framed}
+          \noindent
+    \textbf{RQ1.}
+          What challenges do developers face and what behaviors do they display in the existing developer-centered research on secure software development?\\
+         \noindent
+    \textbf{RQ2.}
+          How do the interventions deal with the behaviors of developers and the challenges they face?\\
+          \noindent
+    \textbf{RQ3.}
+          How can we address the limitations revealed from the analyses of the challenges and interventions?
+\end{framed}
+
+We find five technical and five behavioral challenges that developers face and four categories of interventions. Many developers address the challenges with behavioral solutions while the interventions come with human-centered, as well as technical solutions. Our analysis reveals \emph{tropes}: misplaced beliefs about how developers behave embedded in the core design of APIs, tools and secure programming approaches\footnote{The notion of tropes has been previously used to study how insecurities manifest in internet of things environments~\cite{ola2020trope}}. Such tropes hamper the effectiveness of interventions to support developers in overcoming the technical challenges they face and promoting more secure behaviors, thus adversely affecting secure software development. For example, many APIs assume that \emph{developers are experts} and that they understand security: the challenges we identify suggest that the opposite is true. A correct understanding of the developers’ skills is critical for designing appropriate interventions. We posit that \emph{collaboration} between developers, security experts and library developers is key to unravelling these tropes and their adverse impacts on interventions.
+
+\section{Method}
+
+We reviewed the papers covered in the systematic literature reviews and research agendas of Patnaik~\etal{}, Tahaei~\etal{}, and Acar~\etal{}~\cite{acar2016,tahaei2019,patnaik2019}. We selected papers that provided an insight into developer challenges, behaviors shown by developers, and interventions suggested. Based on this criteria we selected papers and performed snowballing~\cite{wohlin2014guidelines} to find and add more papers to our dataset. This resulted in an initial set of 292 papers, including papers from the bibliographies of our seed papers and a further manual search of the repositories for additional papers. We then read the title and abstract of these papers, and shortlisted papers that explicitly included developer study involving at least one developer. After multiple rounds of snowballing, we reached saturation and did not observe any new papers in our search. Our final set includes 72 papers. 
+To develop our categories of challenges, behaviors and interventions, 
+multiple authors discussed and constructed themes over multiple sessions, based on the contents of the papers.
+
+\section{Challenges and Consequent Behaviors}
+\begin{figure*}\centering
+  \digraph[width=0.8\linewidth]{human}{
+    rankdir=TB
+    compound=true
+    splines=true
+    margin=0.0
+    ranksep=0.65
+
+    node [shape=plaintext]
+
+    miscommunication [label="Miscommunication"]
+    information [label="Hidden Information"]
+    conflict [label="Conflicting goals"]
+    intangibility [label="Intangibility"]
+    scope [label="Narrow Scope"]
+
+    {rank=same miscommunication information conflict intangibility scope}
+
+    mental [label="Mental models"]
+    shifting_assumptions [label="Shifting responsibility"]
+    bias [label="Bias"]
+    herding [label="Herding"]
+    incentives [label="Incentives"]
+
+    {rank=same mental shifting_assumptions bias herding incentives}
+
+    miscommunication -> {mental}
+    information -> {mental bias herding}
+    conflict -> {incentives} 
+    intangibility -> {bias herding} 
+    intangibility -> {incentives} 
+    scope -> {herding}
+    miscommunication -> {shifting_assumptions}
+    information -> {shifting_assumptions}
+    conflict -> {shifting_assumptions}
+  }
+  \caption{Relationships between technical challenges (top) developers face and the behaviors (bottom) they adopt to mitigate them.}
+  \label{fig:human}
+\end{figure*}
+\begin{table*}
+  \caption{Technical challenges developers face, and their categorization.}
+  \label{tab:challenges}
+  \begin{tabular}{p{\dimexpr .2\linewidth - 2\tabcolsep} p{\dimexpr .2\linewidth - 2\tabcolsep} p{\dimexpr .6\linewidth - 2\tabcolsep}}
+    \toprule
+    \tblheader{Theme} & \tblheader{Description} & \tblheader{Examples} \\
+    \midrule
+    Miscommunication & Situations where the API developers' beliefs and knowledge isn't communicated to the end-developers. & `Should I Use a particular API for this particular threat model'?  E.g. \begin{itemize} 
+    \item Measure - What works and what doesn't in an overload of libraries
+    \item Closed - What are the security assumptions of a particular library?
+    \end{itemize}
+                                                                                                               ~\cite{patnaik2019,nadijava2016,acarusability2017,meng2018, justin2015,nguyen2017,zhu2014,hala2016,fahl2013rethinking,oltroggepin2015,justin2019,georgiev2012most,tahaei2019} \\
+    \addlinespace
+
+    Hidden information  & Access to the data is not easy; where it either does not exist, or the data is obscured existing in a form that is nearly impossible to comprehend and use. & `How do I Use this' \begin{itemize} \item Safety - What are the safe uses of access points for security and privacy?  \item Incident Response - Lack of clear documentation on debugging and fixing.\end{itemize}  ~\cite{tahaei2019,fahl2013rethinking,oltroggepin2015,patnaik2019,rashid2019,nadijava2016,acar2016,acarusability2017,oorschootenemy2008, Oliveira2018soups,yskout2012,justin2015,christakis2016, loiacono2017ido,justin2019,senarath2018}\\
+    \addlinespace
+
+    Conflicting goals & Conflicting security goals from organizations, security experts and system and library developers create tensions. & `May I Use a particular patch without affecting the existing functionalities'?\begin{itemize} \item Incompatible updates - where a changing API can break developer's code. \item Power plays - Lack of communication between Security Experts and Developers \end{itemize}
+                                                                                                                                                 ~\cite{acar2016,smithgreen2016,erikacar2017,nadijava2016,thomas2018, erikacar2017,tahaei2019,weir2020,adoption2014,witschey2015,poller2017}\\
+    \addlinespace
+
+    Intangibility (Metrics) & Security is difficult to quantify, and it is hard for developers to be sure whether their actions are harming or hindering the security of their code. & `Will a particular use of a API make the application secure'?\begin{itemize} \item Perceptions - People put less emphasis on outcomes difficult to quantify \item Gains - Developers cannot ascertain benefits of their use of an API \end{itemize} ~\cite{acarusability2017,ranenberg2020,tahaei2019,oliveira2014,hilton2017,anderson2013,acquisitilikes2021}\\ 
+    \addlinespace
+
+    % Perhaps rename `security blinkers'
+    Narrow scope & APIs are overly focused on a single task.  & `How do I integrate non crypto yet security requirements with a particular API'? \begin{itemize} \item Unusable - where APIs do not support auxiliary functions \item Limited - APIs are not defined broadly to include non security requirements \end{itemize}
+                                                                                 ~\cite{smithgreen2016,erikacar2017,christakis2016,oorschootenemy2008}\\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+\begin{table*}
+  \caption{Behaviors developers exhibit when trying to program securely and their categorization.}
+  \label{tab:behaviors}
+  \begin{tabular}{p{\dimexpr .2\linewidth - 2\tabcolsep} p{\dimexpr .2\linewidth - 2\tabcolsep} p{\dimexpr .6\linewidth - 2\tabcolsep}}
+    \toprule
+    \tblheader{Theme} & \tblheader{Description} & \tblheader{Examples} \\
+    \midrule
+
+    Confused mental models & It is difficult for developers to process the complexities of security concepts and/or libraries & `Should we hash and salt even when we use TLS'? \begin{itemize}
+    \item Mental models - Developers understanding of the inner workings of the API are often inconsistent with the complex crypto concepts
+    \item Adversarial Thinking - Developers are not trained in real world failures and adversarial models; thus not driven by objective security considerations. 
+    \end{itemize}
+                                                                                                                                                       ~\cite{votipka2020,naiakshina2019,joseph2021,acar2016,tahaei2019,emmasurface2020,linden2020,yskout2012,edmundson2013,jain2014,naiakshina2017,acargithub2017, oliveira2014, naiakshina2018, justin2019,hadar2018,sawaya2017}\\
+    \addlinespace
+    Shifting Responsibility & Cost of actions of one entity is borne by another entity & `How do I Update without affecting functionalities'?
+    \begin{itemize}
+    \item API providers - Negative impact of poor or missing documentation, cumbersome library update processes. 
+    \item Security experts - Insecure end products due to lack of communication between security experts and developers.
+    \end{itemize}
+                                                                                                                                           ~\cite{acarusability2017,erikacar2017,vaniea2016,patnaik2019,nadijava2016, tahaei2019,meng2018}\\
+    \addlinespace
+    Bias & Use of information sources based on subjective considerations rather objective security considerations & `How to distinguish a correct answer from a wrong answer on stackoverflow'?
+    \begin{itemize}
+    \item Correspondence bias - Completeness of answers or explained code snippets and other surface features appeal more to developers than accuracy. 
+    \item Prior Beliefs - Developers exhibit a tendency to bring their own privacy and security beliefs into their development process. 
+    \end{itemize}
+                                                                                                                                                           ~\cite{linden2020,emmasurface2020,acar2016infosources,senarathundp2018,nadijava2016,erikacar2017,tahaei2019,acar2016, jain2014,naiakshina2017,hadar2018,senarath2018}\\
+    \addlinespace
+    Herding & Following the group behavior  & 
+    `How many other developers are using this particular solution'?
+    \begin{itemize}
+    \item Social Groups - Use of social circles for various activities like testing or choosing security parameters that others in the social group use. 
+    \item Network Effect - Choosing solutions based on the number of their users. Group behavior is also observed in case of assurance mechanisms
+    \end{itemize}
+                                                                                           ~\cite{weir2020,adoption2014,balebako2014,witschey2015, linden2020}\\
+    \addlinespace
+    Incentives & Misalignment of the returns with the efforts of expected behavior & 
+    `Will I be paid for the extra work to add security'?
+    \begin{itemize}
+    \item Financial - Security prevents mass market developers from doing things that might earn more revenue. 
+    \item Organizational Goals - Software development methods rush for functionality. Developers need regular motivation and organization push
+    \end{itemize}
+                                                                                                   ~\cite{naiakshina2019,acar2016,weir2020,assal2018, erikacar2017,tahaei2019, aside2012,ashenden2020,haney2018,poller2017,rahman2016,hilton2017}\\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+ Table~\ref{tab:challenges} describes the technical challenges developers face when attempting to program securely. These do not cover specific challenges  (e.g.~\emph{OpenSSL is hard to use}) but rather higher level challenges. In contrast, Table~\ref{tab:behaviors} describes the broad categories of behaviors developers adopt to address these challenges.
+%
+The split between technical challenges and behaviors comes from how developers try and deal with the difficulty of programming securely. If a developer struggles to understand how to use an API correctly (the \emph{miscommunication} challenge in Table~\ref{tab:challenges}), they may search Stack Overflow for solutions. The answers to Stack Overflow questions are voted and this may create \emph{herding} behaviors (Table~\ref{tab:behaviors}), regardless of whether the answer they follow is correct or not~\cite{emmasurface2020}. The \emph{intangibility} challenge represents a challenge with security as a whole, rather than being specific to any particular development practice. Figure~\ref{fig:human} shows which technical issues lead to an instant behavior. 
+%A technical issue leading to a developer becoming confused (such as the \emph{miscommunication, hidden information} or \emph{narrow scope}); then developers adopt behaviors to try and rationalize correct solutions, either through their own \emph{biases}, following others (\emph{herding}) or possibly incorrect \emph{mental models}.
+
+
+%\subsection{}
+\emph{Miscommunication} describes when API providers do not give adequate clarity of what API to use and their security assumptions, resulting in \emph{confused mental models}. Acar~\etal{} conducted an experiment where 256 python developers were asked to perform a series of cryptographic tasks using 5 Python based cryptographic libraries. They found some APIs are designed for simplicity, reducing the decision space and the chance of it being misused, but simplicity is not enough~\cite{acarusability2017,justin2015,fahl2012,robillard2011}. The study~\cite{acarusability2017} reports that for 20\% of the functionally correct tasks, the developers believed their code was secure, when in fact it was not. Naikashina~\etal{} found that, when storing passwords, while developers  might hash or salt them, they still often end up stored insecurely~\cite{naiakshina2017,naiakshina2018,naiakshina2019}. Patnaik~\etal{} perform a thematic analysis over 2400 StackOverflow posts seeking help with 7 cryptographic libraries. They report 4 usability smells against Green \& Smith's 10 principles~\cite{smithgreen2016}. The usability smells result due to missing or hidden information~\cite{patnaik2019}. Van~der~Linden~\etal{} conduct an experiment with developers to find their coding considerations. They report that developers depict security thinking with their own code but not in testing, seeking help from Stack Overflow or incorporation of APIs etc.~\cite{linden2020}. The questions surrounding how to use a particular API or respond in cases of bugs have been reported in~\cite{patnaik2019,acarusability2017,mindermanrust2018} as well. 
+\begin{finding}
+  \noindent
+ Collaboration between API providers and developers to help explain  and understand  APIs and their security assumptions can lead to security as well as functional correctness.   
+\end{finding}
+
+\emph{{Narrow Scope} and {miscommunication}} lead to \emph{shifting responsibility} among developers where the actions of the API provider lead to developers having to make tedious code updates. \emph{Narrow scope} can result in \emph{herding} behavior. Acar~\etal{} report the hardships faced by developers when libraries do not support auxiliary tasks e.g. secure key exchange~\cite{acarusability2017}. Fahl~\etal{} found that a significant reason behind insecure use of TLS was the insufficient capabilities of the API. Developers improvised to fulfill their requirements and ended up using APIs incorrectly~\cite{fahl2012}. Balebako~\etal{} studies app developers to understand their security and privacy decisions in their development activities. It was reported that less than one-third of app developers understood that data were being collected by third parties~\cite{balebako2014}, a strongly supported finding~\cite{votipka2020,jain2014,hadar2018}. Derr~\etal{} conduct a study with 203 app developers and a concerning conclusion is that API providers contribute to the poor use of updated libraries. Among the reasons cited are overload of updates, confusing version control and conflicts with the preferences of the developers~\cite{erikacar2017,acar2016}. 
+\begin{finding}
+ \noindent  
+ A participatory model of development, where developers and API designers collaborate, will lead to more comprehensible APIs and an improved understanding of their data flow and security requirements.
+\end{finding}
+
+\emph{Hidden Information} is a challenge seen across many empirical studies where usability information does not exist or are not accessible. They include safe uses of a particular library or bug fixing capabilities. Balebako~\etal{} found that developers do not have enough correct information to use security tools~\cite{balebako2014}. Consequently, developers adopt insecure practices based on their \emph{mental models}, their own \emph{biases} and prior beliefs or display \emph{herding} behaviors where they follow what others do. Van~der~Linden~\etal{} conduct an observation of developer's use of Stack Overflow with 1,188 participants. They found developers go by surface features of Stack Overflow posts (such as answer length) over correctness~\cite{emmasurface2020}. \emph{Hidden information} has a bearing on our characterization of \emph{shifting responsibility}. Braz~\etal{} conduct an observation based study among developers to detect the extent to which they can detect improper input validation. They do highlight that lack of security knowledge is an important reason behind poor detection of vulnerabilities~\cite{braz2021}. 
+
+\begin{finding}
+\noindent  
+Closer collaboration between API providers and developer may help the both find and fix bugs, and ease the \emph{bias, herding} and \emph{shifting responsibility} behaviors, though encouraging open source collaboration is an ongoing problem~\cite{german2003gnome}.
+\end{finding}
+
+\emph{Intangibility} comes from a lack of visible benefit of security---problematic if security is not a functional requirement~\cite{acar2016}. This leads to \emph{herding}, \emph{bias} and developers are unable to perceive the \emph{incentives} of security. The pattern of \emph{herding} as well as \emph{bias} in adoption of security tools is reported in~\cite{witschey2015}. App developers tend to adhere to social groups and bring in their privacy beliefs into their development process~\cite{senarath2018,senarathundp2018}.  Braz~et~al{.} notes that security is not a primary goal~\cite{braz2021}. The concerns on incentives, learning support and usability are found across various developer-centered studies~\cite{tahaei2019,oliveira2014}. Sometimes implementing security and privacy is not in a developer's interest: developers might choose libraries for financial reasons~\cite{jain2014}, or for usability reasons~\cite{assal2018,thomas2018,hilton2017}. 
+\begin{finding}
+ \noindent  
+The API providers are ideally placed to collaborate with developers and link the security benefits and pitfalls of how their APIs are used.
+\end{finding}
+
+\emph{Conflicting goals} signifies concentration of security knowledge within experts (\emph{power play})~\cite{weir2020,thomas2018,poller2017} leading to \emph{shifting responsibility} and \emph{incentives}. Derr~\etal{} and Vaniea~\etal{} find that security is not a priority when picking a library by app developers~\cite{erikacar2017,vaniea2016}. Off-the-shelf components are built with different security policies and expectations from the developers' commitments and expectations from the system. Georgiev~\etal{} identified man-in-the-middle (MITM) vulnerabilities in various applications and SDK. The study finds that these MiTM (man-in-the-middle) vulnerabilities were due to poorly designed cryptographic APIs~\cite{georgiev2012most}. 
+
+\begin{finding}
+\noindent  
+Consideration of revenue is a rational and legitimate behavior---a reasonable approach might be to explain to developers the reason behind the restrictions, and work with them rather than blaming them. 
+\end{finding}
+
+\section{Interventions and Tropes that hamper their effectiveness}
+\begin{figure*}[ht]
+\centering
+\digraph[width=1.0\linewidth]{assumptions}{
+    rankdir=TB
+    compound=true
+    splines=true
+    margin=0.0
+    ranksep=0.85
+node [shape=plaintext]
+   
+   human [label="Developers as users"]
+   platforms [label="Platform initiatives"]
+   assurance [label="Assurance mechanisms"]
+   expertise [label="Education"]
+    
+    node [shape=plaintext];
+    
+   experts [label=" `Developers are experts' "]
+   priority[label=" `Security is a universal priority' "]
+   easy [label=" `Security is easy' "]
+   fun [label=" `Maintenance is fun' "]
+   same[label=" `Everyone has same
+   security \& privacy needs'"]
+
+{rank=same;}    
+experts -> {assurance expertise};
+priority -> {assurance expertise platforms};
+easy -> {human expertise};
+fun -> platforms;
+same -> human;
+
+}
+\caption{The tropes we identify (top) and which interventions (bottom) they adversely impact.}
+  \label{fig:assumptions}
+\end{figure*}
+
+\begin{table*}
+  \caption{Interventions to help developers program securely.} 
+  \label{tab:interventions}
+  \begin{tabular}{p{\dimexpr .16\linewidth - 2\tabcolsep} p{\dimexpr .24\linewidth - 2\tabcolsep} p{\dimexpr .6\linewidth - 2\tabcolsep}}
+    \toprule
+    \tblheader{Theme} & \tblheader{Description} & \tblheader{Examples} \\
+    \midrule
+    Developers as users & Developers as users of APIs and code, as much as non-developers are users of their end-products.  Developers need considerations for usability just like everyone else. & 
+    `How to empower developers without knowledge of security'?
+    \begin{itemize}
+    \item Abstraction - Include non security components, safe defaults. 
+    \item Interactions - Incentivization sessions, Security reminders, assist developers through compile time alerts, IDEs. 
+    \end{itemize}
+                                                                                                                                                   ~\cite{acar2016,smithgreen2016,yskout2012,pugh2008,weir2016,adoption2014,witschey2015,jose2016,tondel2008,haney2018,thomas2018,poller2017,zhuaside2013,nguyen2017,rashid2019}\\
+    \addlinespace
+
+    Platform initiatives & Developers build code on top of platforms and within organizations.  The developers and are not wholly responsible for a systems security and code can be constrained and updated externally. & `How to propagate updates to the apps'?
+    \begin{itemize}
+    \item Sandboxing - Google application security program, Gradle, iOS app wrapping
+    \item Patching - Minimal updates without additional functionalities pushed by an API or system provider
+    \end{itemize}
+                                                                                                                                  ~\cite{nadijava2016, whitney2015,baset2017}\\
+    \addlinespace
+
+    Assurance mechanisms & The findings of observation based studies on organized assurance mechanisms. & `How to empower developers without knowledge of security'?
+    \begin{itemize}
+    \item Testing - Intervention mechanisms based testing the developers' outputs, for example: \emph{Red team} exercises, penetration testing; program analysis, and fuzzing
+    \item Organizational culture - secure programming training and incentivization, code and architecture review, organizational focus on security.
+    \end{itemize}
+                                                                                                          ~\cite{ayewah2008,weir2020,rahman2016,weir2016,adoption2014,witschey2015,jose2016,tondel2008,haney2018,thomas2018,poller2017, zhuaside2013,nguyen2017}\\
+    \addlinespace
+    Education &  Not all developers are security experts and API providers should not assume they know how developers will use their code. & `What is the security maturity of developers'?
+    \begin{itemize}
+    \item Experience - Developers with knowledge performed better with the interventions
+    \end{itemize}
+                                                                                                                                              ~\cite{madiha2017,zhu2014,tyler2015,whitney2015,lipford2016,oltroggepin2015,loiacono2017ido,naiakshina2019,haney2018,  witschey2015,acarusability2017,weir2020,adoption2014,linden2020,hala2016}\\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+Table~\ref{tab:interventions} describes four classes of interventions proposed to help developers produce secure code. This includes research on developer-centered usable security \emph{developers as users}; as well as various technical \emph{platform security} initiatives such as patching and sandboxing techniques, and \emph{assurance mechanisms} such as testing, code review, and training.  Some interventions try to find human solutions to human problems, e.g., workshops, incentivization sessions and on-the-=job training. Others aim to find technical solutions to human problems. % We identify four classes of interventions used to aid developers in programming securely.
+
+Several studies~\cite{zhu2014,tyler2015,whitney2015,lipford2016} report assumptions about developers' expertise and training. The issues caused by a lack of, or outdated training is exacerbated when developers are not provided with well-documented APIs and tools~\cite{Oliveira2018soups,acarusability2017,smith2020why}. A related issue is of abstractions~\cite{anderson2013,ranenberg2020}: they are used to make the APIs more usable,  but high-abstraction levels can also lead to restricted flexibility~\cite{loiacono2017ido}. The incentives for inducing developers to spend the effort to program securely are also not aligned with expected returns from doing so~\cite{erikacar2017,naiakshina2018}. The challenges result in bias and group behavior~\cite{emmasurface2020,acar2016infosources}. The improvisations to which developers resort are aided by online sources which can be insecure~\cite{fahl2012,linden2020,acar2016infosources}. Adhering to social groups and choosing answers based on surface features are examples of finding human solutions to technical problems without solving the rooted beliefs or tropes in the larger environment. We represent their impact on the interventions as in figure \ref{fig:assumptions}. We contend that the tropes adversely affect the secure use of APIs, human and technical interventions.
+
+
+ 
+%\subsection{}   
+\emph{Security is a universal priority} inhibits ~\cite{witschey2015,weir2020,McGraw2018} the \emph{assurance mechanisms},  \emph{education} and \emph{platform initiatives}. The role of \emph{assurance mechanisms} have been discussed as effective for secure software development. \emph{Testing} has been identified to aid in secure development ~\cite{jose2016} while ~\cite{weir2020,haney2018,thomas2018} highlights the importance \emph{organizational culture} through incentivization sessions, on the job training and other lightweight interventions. Weir~\etal{} experiments with over 80 developers across 8 organizations and reports that interventions can be successful without security specialists but needs organizational push~\cite{weir2021,tondel2008}. Balebako~\etal{} observes that smaller organizations need adequate support for secure coding~\cite{balebako2014} and that links to the observations found in~\cite{weir2021}.  The importance of organizational push and regular motivations are reported in~\cite{aside2012,weir2020,weir2021,adoption2014}.  Security is not a universal priority~\cite{acar2016,tahaei2019} and it contributes to poor use of updated libraries~\cite{vaniea2016} adversely affecting the \emph{platform initiatives}. 
+\begin{finding}
+\noindent  
+A shared ownership of the security and functionalities of the systems is the way forward even if the underlying reasons for achieving that is different for each of the stakeholders. This can make systems development as much about diplomacy as it is engineering~\cite{bruce2013}.   
+\end{finding}
+
+\emph{Developers are experts} risks the appropriation of the benefits of \emph{assurance mechanisms}~\cite{weir2020,hala2016} as well as \emph{education}. 
+Braz~\etal{} empirically observes the interactions between the developer and improper inputs. Developers with adequate experience and support are able to detect improper inputs with proper priming~\cite{braz2021}. The importance of priming has also been observed in~\cite{joseph2021,thomas2018}. The empirical studies report that developers with \emph{education} performs better be it for secure uses of APIs or to detect insecure uses through the interventions~\cite{madiha2017,naiakshina2018,zhu2014}. 
+
+\begin{finding}\noindent
+These interventions can only be effective if they are aligned according to the security abilities of the developers. This requires collaboration. 
+\end{finding}
+
+%Authors propose  between developers and security experts and security reminders to assist developers. The former argue for as less as touch points possible for the developer to secure the application while latter propose a more co-working model.
+
+\emph{Security is easy} limits the approach of treating \emph{developers as users} and makes \emph{education} inconsequential. Not all developers are equally able~\cite{zhuaside2013,braz2021}. Braz~\etal reports the developers with experience and knowledge detected vulnerabilities better~\cite{braz2021}, a result echoed in case of empirical observation of IDE based interventions reported in~\cite{aside2012}. Security is not easy~\cite{oltrogge2018rise} and a compulsion of education will push developers to appropriate \emph{herding} or \emph{bias}. 
+\begin{finding}
+\noindent  
+If API providers help explain the APIs to the developers that will remove several obstacles, including those reported in~\cite{nadijava2016,acar2016infosources}.  
+\end{finding}
+
+\emph{Maintenance is fun} presupposes that developers will adopt a steep learning curve to appropriate the regular updates of the libraries they use, rendering the \emph{platform initiatives} futile. Research in~\cite{erikacar2017} looks into the adoption of library updates and argues for mediated \emph{patching} of core functionalities to prevent conflict of interests between developers and API providers. 
+
+\begin{finding}
+\noindent
+Library developers have it tough~\cite{hartman2021nontechnical}. 
+Updating and potentially breaking APIs can be problematic.
+API providers and developers both need to collaborate in the update process rather than developers sticking with outdated libraries or API providers breaking developers code.  
+\end{finding}
+
+\emph{Everyone has same security needs} adversely affects the intervention \emph{developers as users}. Research in~\cite{rashid2019,acar2016} make a case for learning from the advances in \ac{HCI} and treat \emph{developers as users}. Green~\etal{} makes 10 specific recommendations including moving the level of \emph{abstraction} to include non security components and having safe defaults~\cite{smithgreen2016}. Acar~\etal{} makes the case for safe defaults~\cite{acarusability2017}. Minderman~\etal{} argues along similar lines of~\cite{smithgreen2016,acar2016} where the authors propose putting a wrapper around the APIs~\cite{mindermanrust2018}. 
+\begin{finding}
+\noindent  
+Increasing the level of \emph{abstraction} can lead to an API becoming focused on a single  threat model. We recommend threat assessments incorporating the concerns of both the API provider and the developers who use them to ensure the threat model is as true to life as possible.
+\end{finding}
+%
+
+\section{Discussion and Conclusion}
+\begin{figure}
+\centering
+\digraph[width=0.9\linewidth]{circle}{
+ rankdir=TB
+ margin=0.0
+ ranksep=1.0
+  
+  challenges [label="Challenges"]
+  behavior [label=" Behavior "]
+  interventions [label="Interventions"]
+  tropes [label="Tropes"]
+  
+{rank=same;}    
+challenges -> behavior[label="lead to"];
+interventions->behavior[label="to address"];
+%interventions->challenges[label="To address"];
+%interventions->challenges[style=dotted,label="Tropes"];
+
+edge [label="arises from"]
+behavior->challenges;
+tropes->{interventions behavior};
+
+}
+\caption{Challenges, behaviors, interventions and tropes and the relationships between them.}
+  \label{fig:circle}
+\end{figure}
+
+Figure \ref{fig:circle} shows the issues we highlighted. The challenges lead to revealed behavior and the interventions were designed to address the challenges and behavior. However, the tropes about developers arise from the failure of the interventions to adequately address all the developers' challenges and behaviors.  This means that tropes about \emph{what we think developers need} may confuse API designers and security experts, and lead to interventions which address the challenges we \emph{think} developers have, rather than the ones they actually face.
+
+Close collaboration between all three parties may offer a solution and  align the assumptions with reality. If API designers and security experts keep the developers out of the loop by not requiring them to understand security, then developers will have less flexibility. Developers need help understanding which APIs to use, when to use them and how to use them safely. They need to understand how to debug the security aspects of their own applications.  API designers and security experts need to help developers have this autonomy by helping developers understand security details (e.g.~modes, algorithms, iterations in cryptography) and by offering them matching incentives in terms of usability~\cite{aside2012,weir2020,tahaei2021sat}. Broadly, it will build an understanding of the abilities, expectations, goals and preferences of the developers and API providers. The understanding will help developers say clearly what they want the system to do (functionalities) in the terms of the API designers, and understand the things the system should not do (security) in their own terms.  The API providers are also developers. Their contexts, priorities and perceptions of security will influence what is possible from a library. Realistic tropes about developers will enable the realization of effective interventions sitting at the intersection of developers and API providers. The effective interventions can be technical, human or a combination of both. Collaboration will lead to a more dynamic approach to securing systems; the usability problems would be easy to identify and can be continually addressed.\footnote{David Deutsch's book ``The Beginning of Infinity'' in the chapter ``Unsustainable'' reflects on the spirit of collaboration about science.} By collaborating with developers, and not treating them as enemies nor users, we can create secure software that works for all.
+
+%Joseph keeping the pop science for now to see how it fits in however I do fully understand your observation.
+
+%\section{Conclusion and future Work}
+
+%Our study explores the relationships between the technical challenges developers face, the behaviors they use to help themselves implement security and the interventions required to help developers program securely.  We find that not all behaviors are due to developers technical struggles, and that not all challenges are met by the interventions currently identified in the literature. There is a worrying trend in the interventions we noted to assume that developers do understand security and that when their failings are pointed out to them, they will understand how to secure their code.  These tropes depend on blaming and coercion. The insulated assumptions are self defeating and does not appear to be correct. 
+
+\balance
+\bibliographystyle{plain}
+\bibliography{secdev}
+
+%\appendix
+%\section{Literature Search}
+%\label{app:query}
+
+%To search for literature related to developer challenges and interventions we used the following search term on IEEE Explore and the ACM Digital Library, as well as a snowballing method on identified literature.
+
+%\begin{quote}\ttfamily
+ %   [[[All: "full text only"] OR [All: :security]] AND [[All: "full text only"] OR [All: :api]]] OR [[[All: "full text only"] OR [All: :library]] AND [[All: "full text only"] OR [All: :interview]]] OR [All: "full text only"] OR [All: :survey] OR [All: "full text only"] OR [All: :questionnaire] OR [[[All: "full text only"] OR [All: :studies]] AND [[All: "full text only"] OR [All: :usability]] AND [[All: "full text only"] OR [All: :developer]] AND [[All: [publication] OR [All: ]]]]
+%\end{quote}
+
+%We also manually reviewed several years of the proceedings from the following venues:
+%\begin{itemize}
+     %\item IEEE Security \& Privacy,
+     %\item IEEE Transactions on Software Engineering,
+     %\item IEEE Secure Development Conference
+     %\item SIGSAC conference on Computer and Communications Security,
+     %\item Annual Computer Security Applications Conference,
+     %\item New Security Paradigms Workshop,
+     %\item International Conference on Software Engineering. 
+%\end{itemize}
+%Other venues were also picked up as part of the snowballing process.
+\end{document}

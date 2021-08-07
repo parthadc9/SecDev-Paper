@@ -1,0 +1,27 @@
+digraph human {
+rankdir=LR
+
+node [shape=plaintext]
+
+miscommunication [label="Miscommunication"]
+information [label="Information cost"]
+conflict [label="Conflicting goals"]
+intangibility [label="Intangibility"]
+scope [label="Narrow Scope"]
+
+{rank=same miscommunication information conflict intangibility scope}
+
+mental [label="Mental models"]
+externalities [label="Externalities"]
+bias [label="Bias"]
+herding [label="Herding"]
+incentives [label="Incentives"]
+
+{rank=same mental externalities bias herding incentives}
+
+miscommunication -> {mental}
+information -> {mental bias herding}
+conflict -> {incentives} [style=dotted]
+intangibility -> {bias herding}
+scope -> {herding}
+}

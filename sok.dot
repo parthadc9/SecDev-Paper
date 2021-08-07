@@ -1,0 +1,33 @@
+digraph sok {
+rankdir=LR
+node [shape=box]
+challenges [label="Challenges"]
+behaviours [label="Behaviours"]
+interventions [label="Interventions"]
+
+node [shape=plaintext]
+abstraction [label="Miscommunication"]
+information [label="Hidden information"]
+conflicts [label="Conflicting goals"]
+intangibility [label="Intangibility"]
+scope [label="Narrow Scope"]
+
+mental [label="Confused mental models"]
+externalities [label="Externalities"]
+bias [label="Bias"]
+herding [label="Herding"]
+incentives [label="Incentives"]
+
+human [label="Developers are users"]
+platforms [label="Platform initiatives"]
+assurance [label="Assurance mechanisms"]
+expertise [label="Education"]
+
+
+challenges -> {abstraction information conflicts intangibility scope}
+behaviours -> {mental externalities bias herding incentives}
+{human platforms assurance expertise} -> interventions [dir=back]
+
+//edge [style=invis]
+//{scope mental} -> {expertise platforms}
+}
